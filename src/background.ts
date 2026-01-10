@@ -1,6 +1,6 @@
 import { API_PATHS, IMAGE_FORMAT, LGTM_BASE_URL } from "#/config/constants";
 
-const fetchLgtmIds = async () => {
+export const fetchLgtmIds = async () => {
   const response = await fetch(`${LGTM_BASE_URL}${API_PATHS.IDS_JSON}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch API: ${response.status}`);
@@ -9,7 +9,7 @@ const fetchLgtmIds = async () => {
   return data.ids as string[];
 };
 
-const getRandomId = (ids: string[]) => {
+export const getRandomId = (ids: string[]) => {
   if (ids.length === 0) {
     throw new Error("No image IDs found");
   }
@@ -21,13 +21,13 @@ const getRandomId = (ids: string[]) => {
   return selectedId;
 };
 
-const generateLgtmHtml = (id: string) => {
+export const generateLgtmHtml = (id: string) => {
   const url = `${LGTM_BASE_URL}/${id}`;
   const imageUrl = `${LGTM_BASE_URL}/${id}${IMAGE_FORMAT.AVIF}`;
   return `<a href="${url}"><img src="${imageUrl}" alt="LGTM!!" width="400" /></a>`;
 };
 
-const copyToClipboard = async (text: string) => {
+export const copyToClipboard = async (text: string) => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   if (!tab || !tab.id) {
@@ -41,7 +41,7 @@ const copyToClipboard = async (text: string) => {
   });
 };
 
-const handleIconClick = async () => {
+export const handleIconClick = async () => {
   try {
     const ids = await fetchLgtmIds();
     const randomId = getRandomId(ids);
