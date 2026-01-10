@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
     "check": "tsc",
     "lint": "biome check .",
     "lint:fix": "biome check --write ."
