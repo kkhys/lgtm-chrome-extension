@@ -10,8 +10,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "all": "pnpm build && pnpm check && pnpm lint:fix && pnpm test:coverage"
+    "coverage": "vitest run --coverage",
+    "all": "pnpm build && pnpm check && pnpm lint:fix && pnpm coverage"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.11",
