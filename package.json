@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "volta": {
+    "node": "24.12.0"
+  }
+}
