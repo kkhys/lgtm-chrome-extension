@@ -26,6 +26,8 @@ const mockChrome = {
       }),
     },
     disable: vi.fn(),
+    setBadgeText: vi.fn(),
+    setBadgeBackgroundColor: vi.fn(),
   },
   runtime: {
     onInstalled: {
@@ -62,6 +64,7 @@ const {
   getRandomId,
   generateLgtmHtml,
   copyToClipboard,
+  showSuccessBadge,
   handleIconClick,
 } = await import("#/background");
 
@@ -275,6 +278,46 @@ describe("background.ts", () => {
     });
   });
 
+  describe("showSuccessBadge", () => {
+    /**
+     * Test badge is set with correct text and color
+     */
+    it("should set badge text and background color", async () => {
+      await showSuccessBadge();
+
+      expect(mockChrome.action.setBadgeText).toHaveBeenCalledWith({
+        text: "✓",
+      });
+      expect(mockChrome.action.setBadgeBackgroundColor).toHaveBeenCalledWith({
+        color: "#4CAF50",
+      });
+    });
+
+    /**
+     * Test badge is cleared after timeout
+     */
+    it("should clear badge text after 2 seconds", async () => {
+      vi.useFakeTimers();
+
+      await showSuccessBadge();
+
+      // Badge should be set initially
+      expect(mockChrome.action.setBadgeText).toHaveBeenCalledWith({
+        text: "✓",
+      });
+
+      // Fast-forward time by 2 seconds
+      vi.advanceTimersByTime(2000);
+
+      // Badge should be cleared
+      expect(mockChrome.action.setBadgeText).toHaveBeenCalledWith({
+        text: "",
+      });
+
+      vi.useRealTimers();
+    });
+  });
+
   describe("handleIconClick", () => {
     /**
      * Test successful icon click handling
@@ -298,6 +341,9 @@ describe("background.ts", () => {
       expect(mockFetch).toHaveBeenCalled();
       expect(mockChrome.tabs.query).toHaveBeenCalled();
       expect(mockChrome.scripting.executeScript).toHaveBeenCalled();
+      expect(mockChrome.action.setBadgeText).toHaveBeenCalledWith({
+        text: "✓",
+      });
 
       mockMathRandom.mockRestore();
     });
@@ -379,6 +425,9 @@ describe("background.ts", () => {
       expect(mockFetch).toHaveBeenCalled();
       expect(mockChrome.tabs.query).toHaveBeenCalled();
       expect(mockChrome.scripting.executeScript).toHaveBeenCalled();
+      expect(mockChrome.action.setBadgeText).toHaveBeenCalledWith({
+        text: "✓",
+      });
     });
   });
 });
