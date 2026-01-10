@@ -1,5 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
+  "name": "lgtm-chrome-extension",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "check": "tsc",
@@ -8,7 +10,12 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.11",
-    "typescript": "5.9.3"
+    "@crxjs/vite-plugin": "2.3.0",
+    "@types/chrome": "0.1.32",
+    "@types/node": "25.0.5",
+    "typescript": "5.9.3",
+    "vite": "7.3.1",
+    "vite-plugin-zip-pack": "1.2.4"
   },
   "packageManager": "pnpm@10.28.0",
   "volta": {
