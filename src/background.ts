@@ -41,14 +41,30 @@ export const copyToClipboard = async (text: string) => {
   });
 };
 
+export const showSuccessBadge = async () => {
+  await chrome.action.setBadgeText({ text: "✓" });
+  await chrome.action.setBadgeBackgroundColor({ color: "#4CAF50" });
+
+  setTimeout(() => {
+    chrome.action.setBadgeText({ text: "" });
+  }, 2000);
+};
+
 export const handleIconClick = async () => {
   try {
     const ids = await fetchLgtmIds();
     const randomId = getRandomId(ids);
     const html = generateLgtmHtml(randomId);
     await copyToClipboard(html);
+    await showSuccessBadge();
   } catch (error) {
     console.error("Copy error:", error);
+    if (error instanceof Error) {
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+      });
+    }
   }
 };
 
