@@ -25,6 +25,27 @@ const mockChrome = {
         onClickedListener = listener;
       }),
     },
+    disable: vi.fn(),
+  },
+  runtime: {
+    onInstalled: {
+      addListener: vi.fn((listener: () => void) => {
+        // Call listener immediately in test environment
+        listener();
+      }),
+    },
+  },
+  declarativeContent: {
+    onPageChanged: {
+      removeRules: vi.fn((_ruleIds: unknown, callback: () => void) => {
+        callback();
+      }),
+      addRules: vi.fn(),
+    },
+    PageStateMatcher: class {
+      constructor(public config: unknown) {}
+    },
+    ShowAction: class {},
   },
 };
 

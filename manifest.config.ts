@@ -26,5 +26,6 @@ export default defineManifest({
     service_worker: "src/background.ts",
     type: "module",
   },
-  permissions: ["activeTab", "scripting"],
+  permissions: ["scripting", "declarativeContent"],
+  host_permissions: ["*://*.github.com/*"],
 });

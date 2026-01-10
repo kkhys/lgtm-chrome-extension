@@ -52,4 +52,26 @@ export const handleIconClick = async () => {
   }
 };
 
+// Enable action only on GitHub
+chrome.runtime.onInstalled.addListener(() => {
+  // Disable action by default (icon will be greyed out)
+  chrome.action.disable();
+
+  // Clear all rules to ensure only our expected rules are set
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
+    // Declare a rule to enable the action on GitHub pages
+    const githubRule = {
+      conditions: [
+        new chrome.declarativeContent.PageStateMatcher({
+          pageUrl: { hostSuffix: ".github.com" },
+        }),
+      ],
+      actions: [new chrome.declarativeContent.ShowAction()],
+    };
+
+    // Apply the rule
+    chrome.declarativeContent.onPageChanged.addRules([githubRule]);
+  });
+});
+
 chrome.action.onClicked.addListener(() => handleIconClick());
