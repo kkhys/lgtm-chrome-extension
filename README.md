@@ -11,6 +11,8 @@ LGTM Chrome Extension is a browser extension that makes it easy to insert LGTM i
 - **One-Click Operation** - Just click the extension icon
 - **Random Selection** - Randomly picks from a rich image library
 - **Instant Copy** - Automatically copies HTML to clipboard
+- **Visual Feedback** - Shows a checkmark badge on the icon for 2 seconds after copying
+- **GitHub-Only Activation** - Works exclusively on GitHub.com domains for focused usage
 - **Lightweight & Fast** - Simple design for quick performance
 - **Privacy-Focused** - Uses only minimal required permissions
 
@@ -31,9 +33,13 @@ _Currently in preparation for Chrome Web Store publication_
 
 ## Usage
 
-1. Click the extension icon
-2. LGTM image HTML code is automatically copied to your clipboard
-3. Paste it into comments on GitHub, GitLab, or other platforms
+1. Navigate to any GitHub page (e.g., pull request, issue, discussion)
+2. Click the extension icon in the toolbar
+3. A green checkmark (✓) badge appears on the icon for 2 seconds
+4. LGTM image HTML code is automatically copied to your clipboard
+5. Paste it into comments on GitHub
+
+**Note**: The extension icon is only enabled on GitHub.com domains. On other websites, the icon will be greyed out.
 
 **Generated HTML format:**
 ```html
@@ -69,6 +75,7 @@ pnpm dev
 2. Open `chrome://extensions/` in Chrome
 3. Enable "Developer mode"
 4. Click "Load unpacked" and select the `dist/` folder
+5. Navigate to GitHub.com to test (icon will be enabled there)
 
 ### Available Commands
 
@@ -141,11 +148,12 @@ pnpm vitest run src/__tests__/background.test.ts
 pnpm vitest watch
 ```
 
-**Test Coverage**: 363 lines of test code covering:
+**Test Coverage**: 433 lines of test code covering 20 test cases:
 - API communication success/failure scenarios
 - Random selection logic
 - HTML generation accuracy
 - Clipboard operations
+- Badge display and auto-clear functionality
 - Error handling
 - End-to-end integration flow
 

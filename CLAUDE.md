@@ -45,25 +45,35 @@ pnpm vitest run -t "fetchLgtmIds"
 ### Chrome Extension Structure
 This is a Chrome Manifest v3 extension with a **single background service worker** architecture - no popup, no options page, no content scripts. The entire functionality is triggered by clicking the extension icon.
 
+**GitHub-Only Activation**: The extension icon is enabled only on GitHub domains (*.github.com). On other websites, the icon is greyed out and non-functional.
+
 ### Execution Flow
 ```
-User clicks extension icon
+Extension installed/updated
   ↓
-chrome.action.onClicked listener (background.ts:55)
+chrome.runtime.onInstalled listener (background.ts:56-75)
+  ↓
+Set declarativeContent rule: Enable action only on GitHub
+  ↓
+User clicks extension icon (on GitHub)
+  ↓
+chrome.action.onClicked listener (background.ts:77)
   ↓
 handleIconClick() orchestrates:
   1. fetchLgtmIds() - GET https://lgtm.kkhys.me/api/ids.json
   2. getRandomId() - Random selection from array
   3. generateLgtmHtml() - Generate <a><img></a> HTML
   4. copyToClipboard() - chrome.scripting.executeScript → navigator.clipboard
+  5. showSuccessBadge() - Display "✓" badge on icon for 2 seconds
 ```
 
 ### Key Files
 
-**src/background.ts** (56 lines)
+**src/background.ts** (93 lines)
 - Main entry point with all core logic
-- Exports 5 testable pure functions + 1 side-effect handler
-- Chrome API usage: `chrome.tabs.query`, `chrome.scripting.executeScript`, `chrome.action.onClicked`
+- Exports 6 testable pure functions + 1 side-effect handler
+- Chrome API usage: `chrome.tabs.query`, `chrome.scripting.executeScript`, `chrome.action.onClicked`, `chrome.action.setBadgeText`, `chrome.action.setBadgeBackgroundColor`, `chrome.runtime.onInstalled`, `chrome.declarativeContent`
+- Implements GitHub-only activation using declarativeContent API
 
 **src/config/constants.ts** (10 lines)
 - Centralized API configuration
@@ -71,10 +81,12 @@ handleIconClick() orchestrates:
 - `API_PATHS`: API endpoints
 - `IMAGE_FORMAT`: Image file extensions
 
-**manifest.config.ts** (21 lines)
+**manifest.config.ts** (31 lines)
 - Chrome manifest definition using `@crxjs/vite-plugin`
-- Permissions: `activeTab` (tab info), `scripting` (clipboard access)
+- Permissions: `scripting` (clipboard access), `declarativeContent` (conditional icon activation)
+- Host Permissions: `*://*.github.com/*` (GitHub domains only)
 - Background service worker: `src/background.ts` as ES module
+- Icons: 4 sizes (16px, 32px, 48px, 128px) for various display contexts
 
 ### Path Alias Configuration
 TypeScript and Vite are configured with `#/*` alias:
@@ -129,17 +141,31 @@ return id;
 const mockChrome = {
   tabs: { query: vi.fn() },
   scripting: { executeScript: vi.fn() },
-  action: { onClicked: { addListener: vi.fn() } }
+  action: {
+    onClicked: { addListener: vi.fn() },
+    disable: vi.fn(),
+    setBadgeText: vi.fn(),
+    setBadgeBackgroundColor: vi.fn()
+  },
+  runtime: {
+    onInstalled: { addListener: vi.fn() }
+  },
+  declarativeContent: {
+    onPageChanged: { removeRules: vi.fn(), addRules: vi.fn() },
+    PageStateMatcher: class {},
+    ShowAction: class {}
+  }
 };
 globalThis.chrome = mockChrome as any;
 ```
 
-**Test Coverage**: 363 lines covering:
+**Test Coverage**: 433 lines covering 20 test cases:
 - API success/failure scenarios
 - Network errors
 - Empty arrays
 - Tab detection failures
-- Integration flow (fetchLgtmIds → getRandomId → generateLgtmHtml → copyToClipboard)
+- Badge display and auto-clear functionality
+- Integration flow (fetchLgtmIds → getRandomId → generateLgtmHtml → copyToClipboard → showSuccessBadge)
 
 When adding new functions, export them for testability and write corresponding test cases.
 
@@ -186,16 +212,20 @@ Examples from this project:
 1. Run `pnpm build` to generate dist/
 2. Chrome → Extensions → Enable Developer Mode
 3. Load Unpacked → Select dist/ directory
+4. Navigate to GitHub (e.g., https://github.com) to test - icon will be enabled
+5. Navigate to non-GitHub site - icon will be greyed out
 
 ### Development Workflow
 - Use `pnpm dev` for hot reload during development
 - Vite dev server serves the extension with automatic rebuilds
 - Refresh extension in chrome://extensions/ after manifest changes
+- **Important**: Test on GitHub domains (*.github.com) as the extension only activates there
 
 ### Debugging
 - Check service worker logs: chrome://extensions/ → Inspect service worker
 - Tab console shows clipboard operation results
 - Network errors appear in service worker console
+- Icon state (enabled/greyed out) changes automatically when navigating between GitHub and non-GitHub sites
 
 ### Version Updates
 Update version in `package.json` only - manifest.config.ts reads from it automatically. The ZIP filename is also generated from package.json version.
