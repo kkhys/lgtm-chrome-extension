@@ -1,5 +1,7 @@
+import { API_PATHS, IMAGE_FORMAT, LGTM_BASE_URL } from "#/config/constants";
+
 const fetchLgtmIds = async () => {
-  const response = await fetch("https://lgtm.kkhys.me/api/ids.json");
+  const response = await fetch(`${LGTM_BASE_URL}${API_PATHS.IDS_JSON}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch API: ${response.status}`);
   }
@@ -20,8 +22,8 @@ const getRandomId = (ids: string[]) => {
 };
 
 const generateLgtmHtml = (id: string) => {
-  const url = `https://lgtm.kkhys.me/${id}`;
-  const imageUrl = `https://lgtm.kkhys.me/${id}.avif`;
+  const url = `${LGTM_BASE_URL}/${id}`;
+  const imageUrl = `${LGTM_BASE_URL}/${id}${IMAGE_FORMAT.AVIF}`;
   return `<a href="${url}"><img src="${imageUrl}" alt="LGTM!!" width="400" /></a>`;
 };
 
