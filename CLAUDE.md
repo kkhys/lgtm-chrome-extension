@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Package Manager
-**Use pnpm exclusively** - Volta manages Node.js 24.12.0 automatically.
+**Use pnpm exclusively** - Node.js version is managed by `.tool-versions` (asdf/mise).
 
 ### Essential Commands
 ```bash
