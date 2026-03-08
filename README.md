@@ -18,9 +18,9 @@ LGTM Chrome Extension is a browser extension that makes it easy to insert LGTM i
 
 ## Installation
 
-### From Chrome Web Store (Coming Soon)
+### From Chrome Web Store
 
-_Currently in preparation for Chrome Web Store publication_
+Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/lgtm-chrome-extension/pekflahhcpfnbllbphcjnjngkhlabohh).
 
 ### Manual Installation
 
@@ -169,6 +169,7 @@ Copyright (c) 2026 Keisuke Hayashi
 
 ## Links
 
+- [Chrome Web Store](https://chromewebstore.google.com/detail/lgtm-chrome-extension/pekflahhcpfnbllbphcjnjngkhlabohh)
 - [LGTM Image Service](https://lgtm.kkhys.me)
 - [Issues](https://github.com/kkhys/lgtm-chrome-extension/issues)
 - [Releases](https://github.com/kkhys/lgtm-chrome-extension/releases)
