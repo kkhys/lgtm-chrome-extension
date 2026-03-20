@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Package Manager
-**Use pnpm exclusively** - Node.js version is managed by `.tool-versions` (asdf/mise).
+**Use pnpm exclusively** - Development environment is managed by Nix Flakes (`flake.nix`) with direnv integration (`.envrc`).
 
 ### Essential Commands
 ```bash
