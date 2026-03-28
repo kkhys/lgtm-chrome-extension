@@ -22,9 +22,8 @@
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
     "types": ["vite/client", "chrome"],
-    "baseUrl": ".",
     "paths": {
-      "#/*": ["src/*"]
+      "#/*": ["./src/*"]
     },
     "skipLibCheck": true,
     "noUncheckedSideEffectImports": true,
