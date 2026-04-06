@@ -16,8 +16,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
     "@crxjs/vite-plugin": "2.4.0",
-    "@types/chrome": "0.1.38",
-    "@types/node": "25.5.0",
+    "@types/chrome": "0.1.39",
+    "@types/node": "25.5.2",
     "@vitest/coverage-v8": "4.1.2",
     "jsdom": "29.0.1",
     "typescript": "6.0.2",
