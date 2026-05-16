@@ -1,29 +1,47 @@
-import { API_PATHS, IMAGE_FORMAT, LGTM_BASE_URL } from "#/config/constants";
+import {
+  API_PATHS,
+  LGTM_BASE_URL,
+  LGTM_FORMATS,
+  type LgtmEntry,
+} from "#/config/constants";
 
-export const fetchLgtmIds = async () => {
+const isLgtmEntry = (value: unknown): value is LgtmEntry => {
+  if (typeof value !== "object" || value === null) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.format === "string" &&
+    (LGTM_FORMATS as readonly string[]).includes(candidate.format)
+  );
+};
+
+export const fetchLgtmEntries = async (): Promise<LgtmEntry[]> => {
   const response = await fetch(`${LGTM_BASE_URL}${API_PATHS.IDS_JSON}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch API: ${response.status}`);
   }
   const data = await response.json();
-  return data.ids as string[];
+  if (!Array.isArray(data?.entries) || !data.entries.every(isLgtmEntry)) {
+    throw new Error("Unexpected API response: entries missing or malformed");
+  }
+  return data.entries;
 };
 
-export const getRandomId = (ids: string[]) => {
-  if (ids.length === 0) {
-    throw new Error("No image IDs found");
+export const getRandomEntry = (entries: LgtmEntry[]): LgtmEntry => {
+  if (entries.length === 0) {
+    throw new Error("No image entries found");
   }
-  const randomIndex = Math.floor(Math.random() * ids.length);
-  const selectedId = ids[randomIndex];
-  if (selectedId === undefined) {
-    throw new Error("Unexpected error: Failed to get ID");
+  const randomIndex = Math.floor(Math.random() * entries.length);
+  const selected = entries[randomIndex];
+  if (selected === undefined) {
+    throw new Error("Unexpected error: Failed to get entry");
   }
-  return selectedId;
+  return selected;
 };
 
-export const generateLgtmHtml = (id: string) => {
+export const generateLgtmHtml = ({ id, format }: LgtmEntry): string => {
   const url = `${LGTM_BASE_URL}/${id}`;
-  const imageUrl = `${LGTM_BASE_URL}/${id}${IMAGE_FORMAT.AVIF}`;
+  const imageUrl = `${LGTM_BASE_URL}/${id}.${format}`;
   return `<a href="${url}"><img src="${imageUrl}" alt="LGTM!!" width="400" /></a>`;
 };
 
@@ -52,9 +70,9 @@ export const showSuccessBadge = async () => {
 
 export const handleIconClick = async () => {
   try {
-    const ids = await fetchLgtmIds();
-    const randomId = getRandomId(ids);
-    const html = generateLgtmHtml(randomId);
+    const entries = await fetchLgtmEntries();
+    const entry = getRandomEntry(entries);
+    const html = generateLgtmHtml(entry);
     await copyToClipboard(html);
     await showSuccessBadge();
   } catch (error) {
