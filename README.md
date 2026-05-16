@@ -44,9 +44,12 @@ Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/lgt
 **Generated HTML format:**
 ```html
 <a href="https://lgtm.kkhys.me/{id}">
-  <img src="https://lgtm.kkhys.me/{id}.avif" alt="LGTM!!" width="400" />
+  <img src="https://lgtm.kkhys.me/{id}.{format}" alt="LGTM!!" width="400" />
 </a>
 ```
+
+`{format}` is `avif` for still images and `webp` for animated ones. The
+extension picks the correct format per entry from the API response.
 
 ## Development
 
@@ -130,7 +133,8 @@ lgtm-chrome-extension/
 This Chrome extension integrates with the [LGTM Image Service](https://lgtm.kkhys.me).
 
 - **Endpoint**: `https://lgtm.kkhys.me/api/ids.json`
-- **Image Format**: AVIF (optimized next-generation image format)
+- **Image Format**: AVIF for still images, animated WebP for animated sources
+  (determined per entry via the API response's `entries[].format` field)
 
 ## Testing
 

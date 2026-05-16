@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { API_PATHS, IMAGE_FORMAT, LGTM_BASE_URL } from "#/config/constants";
+import { API_PATHS, LGTM_BASE_URL, type LgtmEntry } from "#/config/constants";
 
 /**
  * Tests for background.ts
@@ -60,13 +60,16 @@ globalThis.fetch = mockFetch;
 
 // Import background.ts after setting up mocks
 const {
-  fetchLgtmIds,
-  getRandomId,
+  fetchLgtmEntries,
+  getRandomEntry,
   generateLgtmHtml,
   copyToClipboard,
   showSuccessBadge,
   handleIconClick,
 } = await import("#/background");
+
+const stillEntry: LgtmEntry = { id: "still-id", format: "avif" };
+const animatedEntry: LgtmEntry = { id: "animated-id", format: "webp" };
 
 describe("background.ts", () => {
   beforeEach(() => {
@@ -77,21 +80,20 @@ describe("background.ts", () => {
     vi.restoreAllMocks();
   });
 
-  describe("fetchLgtmIds", () => {
+  describe("fetchLgtmEntries", () => {
     /**
-     * Test successful ID list retrieval
+     * Test successful entry list retrieval
      */
-    it("should successfully fetch ID list from API", async () => {
-      const mockIds = ["id1", "id2", "id3"];
+    it("should successfully fetch entries from API", async () => {
+      const mockEntries: LgtmEntry[] = [stillEntry, animatedEntry];
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ids: mockIds }),
+        json: async () => ({ entries: mockEntries }),
         status: 200,
       });
 
-      const ids = await fetchLgtmIds();
-      expect(ids).toEqual(mockIds);
-      expect(Array.isArray(ids)).toBe(true);
+      const entries = await fetchLgtmEntries();
+      expect(entries).toEqual(mockEntries);
       expect(mockFetch).toHaveBeenCalledWith(
         `${LGTM_BASE_URL}${API_PATHS.IDS_JSON}`,
       );
@@ -106,7 +108,9 @@ describe("background.ts", () => {
         status: 500,
       });
 
-      await expect(fetchLgtmIds()).rejects.toThrow("Failed to fetch API: 500");
+      await expect(fetchLgtmEntries()).rejects.toThrow(
+        "Failed to fetch API: 500",
+      );
     });
 
     /**
@@ -115,26 +119,54 @@ describe("background.ts", () => {
     it("should throw error on network failure", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(fetchLgtmIds()).rejects.toThrow("Network error");
+      await expect(fetchLgtmEntries()).rejects.toThrow("Network error");
+    });
+
+    /**
+     * Test malformed payload handling
+     */
+    it("should throw error when entries field is missing", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ids: ["id1"] }),
+      });
+
+      await expect(fetchLgtmEntries()).rejects.toThrow(
+        "Unexpected API response: entries missing or malformed",
+      );
+    });
+
+    it("should throw error when entry format is unknown", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ entries: [{ id: "x", format: "png" }] }),
+      });
+
+      await expect(fetchLgtmEntries()).rejects.toThrow(
+        "Unexpected API response: entries missing or malformed",
+      );
     });
   });
 
-  describe("getRandomId", () => {
+  describe("getRandomEntry", () => {
     /**
-     * Test random ID selection from array
+     * Test random entry selection from array
      */
-    it("should select random ID from array", () => {
-      const ids = ["id1", "id2", "id3", "id4", "id5"];
+    it("should select random entry from array", () => {
+      const entries: LgtmEntry[] = [
+        { id: "id1", format: "avif" },
+        { id: "id2", format: "avif" },
+        { id: "id3", format: "webp" },
+        { id: "id4", format: "avif" },
+        { id: "id5", format: "webp" },
+      ];
 
-      // Mock Math.random for predictable behavior
       const mockMathRandom = vi.spyOn(Math, "random");
-      mockMathRandom.mockReturnValue(0.5); // Select middle element
+      mockMathRandom.mockReturnValue(0.5);
 
-      const selectedId = getRandomId(ids);
+      const selected = getRandomEntry(entries);
 
-      expect(selectedId).toBeDefined();
-      expect(ids).toContain(selectedId);
-      expect(selectedId).toBe("id3"); // 0.5 * 5 = 2.5 -> floor(2.5) = 2 -> ids[2] = "id3"
+      expect(selected).toEqual({ id: "id3", format: "webp" });
 
       mockMathRandom.mockRestore();
     });
@@ -143,72 +175,52 @@ describe("background.ts", () => {
      * Test error handling for empty array
      */
     it("should throw error when array is empty", () => {
-      const ids: string[] = [];
-
-      expect(() => getRandomId(ids)).toThrow("No image IDs found");
+      expect(() => getRandomEntry([])).toThrow("No image entries found");
     });
 
     /**
      * Test with single element array
      */
     it("should work correctly with single element array", () => {
-      const ids = ["single-id"];
-      const selectedId = getRandomId(ids);
+      const selected = getRandomEntry([stillEntry]);
 
-      expect(selectedId).toBe("single-id");
-    });
-
-    /**
-     * Test error handling when array element is undefined
-     */
-    it("should throw error when array element is undefined", () => {
-      // Test case where selectedId becomes undefined
-      const ids = [undefined as unknown as string];
-
-      expect(() => getRandomId(ids)).toThrow(
-        "Unexpected error: Failed to get ID",
-      );
+      expect(selected).toEqual(stillEntry);
     });
   });
 
   describe("generateLgtmHtml", () => {
     /**
-     * Test correct HTML format generation
+     * Test correct HTML format generation for still entry
      */
-    it("should generate correct HTML format", () => {
-      const testId = "test-id-123";
-      const expectedUrl = `${LGTM_BASE_URL}/${testId}`;
-      const expectedImageUrl = `${LGTM_BASE_URL}/${testId}${IMAGE_FORMAT.AVIF}`;
+    it("should generate avif HTML for still entry", () => {
+      const expectedUrl = `${LGTM_BASE_URL}/${stillEntry.id}`;
+      const expectedImageUrl = `${LGTM_BASE_URL}/${stillEntry.id}.avif`;
       const expectedHtml = `<a href="${expectedUrl}"><img src="${expectedImageUrl}" alt="LGTM!!" width="400" /></a>`;
 
-      const html = generateLgtmHtml(testId);
+      expect(generateLgtmHtml(stillEntry)).toBe(expectedHtml);
+    });
 
-      expect(html).toBe(expectedHtml);
+    /**
+     * Test correct HTML format generation for animated entry
+     */
+    it("should generate webp HTML for animated entry", () => {
+      const expectedUrl = `${LGTM_BASE_URL}/${animatedEntry.id}`;
+      const expectedImageUrl = `${LGTM_BASE_URL}/${animatedEntry.id}.webp`;
+      const expectedHtml = `<a href="${expectedUrl}"><img src="${expectedImageUrl}" alt="LGTM!!" width="400" /></a>`;
+
+      expect(generateLgtmHtml(animatedEntry)).toBe(expectedHtml);
     });
 
     /**
      * Test that HTML contains required elements
      */
     it("should contain all required HTML elements", () => {
-      const testId = "test-id";
-      const html = generateLgtmHtml(testId);
+      const html = generateLgtmHtml(stillEntry);
 
       expect(html).toContain("<a href=");
       expect(html).toContain("<img src=");
       expect(html).toContain('alt="LGTM!!"');
       expect(html).toContain('width="400"');
-      expect(html).toContain(IMAGE_FORMAT.AVIF);
-    });
-
-    /**
-     * Test HTML generation with special characters in ID
-     */
-    it("should generate HTML correctly with special characters in ID", () => {
-      const testId = "test-id_with-special.chars123";
-      const html = generateLgtmHtml(testId);
-
-      expect(html).toContain(testId);
-      expect(html).toContain(IMAGE_FORMAT.AVIF);
     });
   });
 
@@ -323,24 +335,28 @@ describe("background.ts", () => {
      * Test successful icon click handling
      */
     it("should complete icon click handling successfully", async () => {
-      const mockIds = ["id1", "id2", "id3"];
+      const mockEntries: LgtmEntry[] = [stillEntry, animatedEntry];
       const mockTab = { id: 123, active: true };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ids: mockIds }),
+        json: async () => ({ entries: mockEntries }),
       });
       mockChrome.tabs.query.mockResolvedValueOnce([mockTab]);
       mockChrome.scripting.executeScript.mockResolvedValueOnce([]);
 
       const mockMathRandom = vi.spyOn(Math, "random");
-      mockMathRandom.mockReturnValue(0.5);
+      mockMathRandom.mockReturnValue(0.99);
 
       await handleIconClick();
 
       expect(mockFetch).toHaveBeenCalled();
       expect(mockChrome.tabs.query).toHaveBeenCalled();
-      expect(mockChrome.scripting.executeScript).toHaveBeenCalled();
+      const executeScriptCall =
+        mockChrome.scripting.executeScript.mock.calls[0];
+      expect(executeScriptCall?.[0].args?.[0]).toContain(
+        `${LGTM_BASE_URL}/${animatedEntry.id}.webp`,
+      );
       expect(mockChrome.action.setBadgeText).toHaveBeenCalledWith({
         text: "✓",
       });
@@ -375,11 +391,10 @@ describe("background.ts", () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementation(() => {});
-      const mockIds = ["id1", "id2", "id3"];
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ids: mockIds }),
+        json: async () => ({ entries: [stillEntry] }),
       });
       mockChrome.tabs.query.mockResolvedValueOnce([]);
 
@@ -408,12 +423,11 @@ describe("background.ts", () => {
      * Test that chrome.action.onClicked listener works correctly
      */
     it("should execute chrome.action.onClicked listener correctly", async () => {
-      const mockIds = ["test-id"];
       const mockTab = { id: 456, active: true };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ids: mockIds }),
+        json: async () => ({ entries: [stillEntry] }),
       });
       mockChrome.tabs.query.mockResolvedValueOnce([mockTab]);
       mockChrome.scripting.executeScript.mockResolvedValueOnce([]);
