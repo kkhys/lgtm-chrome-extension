@@ -12,8 +12,8 @@ importers:
         specifier: 2.5.0
         version: 2.5.0
       '@crxjs/vite-plugin':
-        specifier: 2.6.1
-        version: 2.6.1(vite@8.0.16(@types/node@25.9.3))
+        specifier: 2.7.0
+        version: 2.7.0(vite@8.0.16(@types/node@25.9.3))
       '@types/chrome':
         specifier: 0.1.43
         version: 0.1.43
@@ -138,8 +138,8 @@ packages:
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
     hasBin: true
 
-  '@crxjs/vite-plugin@2.6.1':
-    resolution: {integrity: sha512-0RmYlUtQGvHXCz3B/FW7P5j+RBZUc4mk3GIRPXCx5a52N8AQ0e35GvE+Pcap/TKuI09PJgcRTdXeBOavtLVyYg==}
+  '@crxjs/vite-plugin@2.7.0':
+    resolution: {integrity: sha512-NN98fUgJOEiVBshELJnYCW54+K2Yy067++/K+RdxclHsyG08ea+Em3lJJTubtPTCl2bECyp4+K69oT+izilnNw==}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
 
@@ -385,8 +385,8 @@ packages:
   '@webcomponents/custom-elements@1.6.0':
     resolution: {integrity: sha512-CqTpxOlUCPWRNUPZDxT5v2NnHXA4oox612iUGnmTUGQFhZ1Gkj8kirtl/2wcF6MqX7+PqqicZzOCBKKfIn0dww==}
 
-  acorn-walk@8.3.4:
-    resolution: {integrity: sha512-ueEepnujpqee2o5aIYnvHU6C0A42MNdsIDeqy5BydrkuC5R1ZuUFnm27EeFJGoEHJQgn3uleRvmTXaJgfXbt4g==}
+  acorn-walk@8.3.5:
+    resolution: {integrity: sha512-HEHNfbars9v4pgpW6SO1KSPkfoS0xVOM/9UzkJltjlsHZmJasxg8aXkuZa7SMf8vKGIBhpUsPluQSqhJFCqebw==}
     engines: {node: '>=0.4.0'}
 
   acorn@8.15.0:
@@ -706,10 +706,6 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
-  react-refresh@0.13.0:
-    resolution: {integrity: sha512-XP8A9BT0CpRBD+NYLLeIhld/RqG9+gktUjW1FkE+Vm7OCinbG1SshcK5tb9ls4kzvjZr9mOQc7HYgBngEyPAXg==}
-    engines: {node: '>=0.10.0'}
-
   readable-stream@2.3.8:
     resolution: {integrity: sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==}
 
@@ -1013,10 +1009,10 @@ snapshots:
     dependencies:
       css-tree: 3.2.1
 
-  '@crxjs/vite-plugin@2.6.1(vite@8.0.16(@types/node@25.9.3))':
+  '@crxjs/vite-plugin@2.7.0(vite@8.0.16(@types/node@25.9.3))':
     dependencies:
       '@webcomponents/custom-elements': 1.6.0
-      acorn-walk: 8.3.4
+      acorn-walk: 8.3.5
       convert-source-map: 1.9.0
       debug: 4.4.3
       es-module-lexer: 0.10.5
@@ -1026,7 +1022,6 @@ snapshots:
       node-html-parser: 7.1.0
       pathe: 2.0.3
       picocolors: 1.1.1
-      react-refresh: 0.13.0
       rollup: 2.80.0
       rxjs: 7.5.7
       tinyglobby: 0.2.17
@@ -1235,7 +1230,7 @@ snapshots:
 
   '@webcomponents/custom-elements@1.6.0': {}
 
-  acorn-walk@8.3.4:
+  acorn-walk@8.3.5:
     dependencies:
       acorn: 8.15.0
 
@@ -1523,8 +1518,6 @@ snapshots:
   process-nextick-args@2.0.1: {}
 
   punycode@2.3.1: {}
-
-  react-refresh@0.13.0: {}
 
   readable-stream@2.3.8:
     dependencies:
