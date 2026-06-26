@@ -14,14 +14,14 @@
     "all": "pnpm build && pnpm check && pnpm lint:fix && pnpm coverage"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.0",
+    "@biomejs/biome": "2.5.1",
     "@crxjs/vite-plugin": "2.7.0",
     "@types/chrome": "0.2.0",
     "@types/node": "25.9.4",
     "@vitest/coverage-v8": "4.1.9",
     "jsdom": "29.1.1",
     "typescript": "6.0.3",
-    "vite": "8.0.16",
+    "vite": "8.1.0",
     "vite-plugin-zip-pack": "1.2.4",
     "vitest": "4.1.9"
   }
